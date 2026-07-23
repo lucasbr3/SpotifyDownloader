@@ -1,0 +1,89 @@
+<Page
+    x:Class="SpotifyDownloader.App.Views.DownloadsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:core="using:SpotifyDownloader.Core.Models"
+    x:Name="PageRoot">
+
+    <Grid Padding="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Downloads" Style="{StaticResource TitleTextBlockStyle}" Margin="0,0,0,8"/>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8" Margin="0,0,0,16">
+            <Button Command="{x:Bind ViewModel.ClearCompletedCommand}" Content="Limpar Concluídos"/>
+            <Button Command="{x:Bind ViewModel.ClearAllCommand}" Content="Cancelar Todos"/>
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="2">
+            <muxc:ItemsRepeater ItemsSource="{x:Bind ViewModel.ActiveDownloads, Mode=OneWay}">
+                <muxc:ItemsRepeater.Layout><StackLayout Orientation="Vertical"/></muxc:ItemsRepeater.Layout>
+                <muxc:ItemsRepeater.ItemTemplate>
+                    <DataTemplate x:DataType="core:DownloadItem">
+                        <Border CornerRadius="8" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                Padding="12,8" Margin="0,0,0,4">
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="48"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Image Source="{x:Bind Track.AlbumCoverUrl}" Width="48" Height="48" CornerRadius="4"/>
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="{x:Bind Track.Title}" Style="{StaticResource BodyStrongTextBlockStyle}" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{x:Bind Track.Artist}" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                    <TextBlock Text="{x:Bind StatusText}" Style="{StaticResource CaptionTextBlockStyle}"
+                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                    <TextBlock Text="{x:Bind SpeedFormatted}" Style="{StaticResource CaptionTextBlockStyle}"
+                                               Foreground="{ThemeResource TextFillColorTertiaryBrush}" 
+                                               Visibility="{x:Bind ShowSpeed, Mode=OneWay}"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="3" VerticalAlignment="Center">
+                                    <muxc:ProgressBar Value="{x:Bind Progress, Mode=OneWay}" Height="4" CornerRadius="2"/>
+                                    <TextBlock Text="{x:Bind ProgressPercent}" Style="{StaticResource CaptionTextBlockStyle}"
+                                               Foreground="{ThemeResource TextFillColorTertiaryBrush}" HorizontalAlignment="Center"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                                    <Button Command="{Binding ElementName=PageRoot, Path=ViewModel.PauseCommand}" CommandParameter="{x:Bind}"
+                                            Background="Transparent" BorderThickness="0"
+                                            FontFamily="Segoe MDL2 Assets" Content="&#xE769;" Width="32" Height="32"
+                                            Visibility="{x:Bind IsDownloading, Mode=OneWay}"/>
+                                    <Button Command="{Binding ElementName=PageRoot, Path=ViewModel.ResumeCommand}" CommandParameter="{x:Bind}"
+                                            Background="Transparent" BorderThickness="0"
+                                            FontFamily="Segoe MDL2 Assets" Content="&#xE768;" Width="32" Height="32"
+                                            Visibility="{x:Bind IsPaused, Mode=OneWay}"/>
+                                    <Button Command="{Binding ElementName=PageRoot, Path=ViewModel.CancelCommand}" CommandParameter="{x:Bind}"
+                                            Background="Transparent" BorderThickness="0"
+                                            FontFamily="Segoe MDL2 Assets" Content="&#xE711;" Width="32" Height="32"
+                                            Visibility="{x:Bind ShowCancel, Mode=OneWay}"/>
+                                    <Button Command="{Binding ElementName=PageRoot, Path=ViewModel.RetryCommand}" CommandParameter="{x:Bind}"
+                                            Background="Transparent" BorderThickness="0"
+                                            FontFamily="Segoe MDL2 Assets" Content="&#xE72C;" Width="32" Height="32"
+                                            Visibility="{x:Bind ShowRetry, Mode=OneWay}"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </muxc:ItemsRepeater.ItemTemplate>
+            </muxc:ItemsRepeater>
+
+            <TextBlock Text="Nenhum download ativo" Style="{StaticResource BodyTextBlockStyle}"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                       Visibility="{x:Bind ViewModel.HasActiveDownloads, Converter={StaticResource InvertBoolToVisibility}, ConverterParameter=True, Mode=OneWay}"/>
+        </ScrollViewer>
+    </Grid>
+</Page>

@@ -1,0 +1,229 @@
+<Page
+    x:Class="SpotifyDownloader.App.Views.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:vm="using:SpotifyDownloader.App.ViewModels">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="32"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Custom Title Bar -->
+        <Grid x:Name="AppTitleBar" Background="{ThemeResource SolidBackgroundFillColorBaseBrush}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="48"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Image Source="ms-appx:///Assets/icon.png" Width="20" Height="20" Margin="14,0,0,0" VerticalAlignment="Center"/>
+
+            <TextBlock Grid.Column="1" Text="{x:Bind ViewModel.PageTitle, Mode=OneWay}"
+                       Style="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Center"
+                       Foreground="{ThemeResource TextFillColorPrimaryBrush}"/>
+
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="0,0,8,0">
+                <Button x:Name="MiniPlayerBtn" Command="{x:Bind PlayerViewModel.ToggleMiniPlayerCommand}"
+                        ToolTipService.ToolTip="Mini Player"
+                        Background="Transparent" BorderThickness="0"
+                        FontFamily="Segoe MDL2 Assets" Content="&#xE740;" Width="40"/>
+                <Button x:Name="SettingsBtn" Command="{x:Bind ViewModel.OpenSettingsCommand}"
+                        ToolTipService.ToolTip="Configurações"
+                        Background="Transparent" BorderThickness="0"
+                        FontFamily="Segoe MDL2 Assets" Content="&#xE713;" Width="40"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Main Navigation + Content -->
+        <muxc:NavigationView Grid.Row="1"
+                              x:Name="NavView"
+                              IsBackButtonVisible="Collapsed"
+                              IsSettingsVisible="False"
+                              PaneDisplayMode="Auto"
+                              OpenPaneLength="220"
+                              CompactModeThresholdWidth="640"
+                              SelectionChanged="OnNavigationSelectionChanged">
+
+            <muxc:NavigationView.MenuItems>
+                <muxc:NavigationViewItem Tag="home" Icon="Home" Content="Início"/>
+                <muxc:NavigationViewItem Tag="search" Icon="Find" Content="Pesquisar"/>
+                <muxc:NavigationViewItem Tag="playlists" Icon="MusicInfo" Content="Playlists"/>
+                <muxc:NavigationViewItem Tag="albums" Icon="Pictures" Content="Álbuns"/>
+                <muxc:NavigationViewItem Tag="liked" Icon="Favorite" Content="Curtidas"/>
+            </muxc:NavigationView.MenuItems>
+
+            <muxc:NavigationView.FooterMenuItems>
+                <muxc:NavigationViewItem Tag="downloads" Icon="Download" Content="Downloads"/>
+                <muxc:NavigationViewItem Tag="history" Icon="History" Content="Histórico"/>
+                <muxc:NavigationViewItem Tag="about" Icon="Help" Content="Sobre"/>
+            </muxc:NavigationView.FooterMenuItems>
+
+            <muxc:NavigationView.PaneFooter>
+                <StackPanel Padding="12,8">
+                    <TextBlock Text="Sem autenticação necessária"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </muxc:NavigationView.PaneFooter>
+
+            <ScrollViewer>
+                <Frame x:Name="ContentFrame"/>
+            </ScrollViewer>
+        </muxc:NavigationView>
+
+        <!-- Bottom Player Bar (Modern) -->
+        <Border Grid.Row="2"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                BorderThickness="0,1,0,0"
+                Visibility="{x:Bind PlayerViewModel.HasTrack, Converter={StaticResource BoolToVisibility}, Mode=OneWay}">
+            <Grid x:Name="PlayerBar" Padding="12,8">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="240"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="220"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Track Info -->
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <Border Width="48" Height="48" CornerRadius="8"
+                                Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}">
+                            <Image Source="{x:Bind PlayerViewModel.AlbumCoverUrl, Mode=OneWay}"
+                                   Width="48" Height="48" CornerRadius="8" Stretch="UniformToFill"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="{x:Bind PlayerViewModel.TrackTitle, Mode=OneWay}"
+                                       Style="{StaticResource BodyStrongTextBlockStyle}" TextTrimming="CharacterEllipsis"
+                                       MaxWidth="160"/>
+                            <TextBlock Text="{x:Bind PlayerViewModel.TrackArtist, Mode=OneWay}"
+                                       Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                       TextTrimming="CharacterEllipsis" MaxWidth="160"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Playback Controls -->
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="4">
+                            <Button Command="{x:Bind PlayerViewModel.PreviousCommand}"
+                                    Background="Transparent" BorderThickness="0"
+                                    FontFamily="Segoe MDL2 Assets" Content="&#xE892;" Width="32" Height="32"/>
+                            <Button Command="{x:Bind PlayerViewModel.PlayPauseCommand}"
+                                    Width="36" Height="36" CornerRadius="18"
+                                    Background="{ThemeResource AccentButtonBackground}" BorderThickness="0"
+                                    FontFamily="Segoe MDL2 Assets"
+                                    Content="{x:Bind PlayerViewModel.PlayPauseIcon, Mode=OneWay}"/>
+                            <Button Command="{x:Bind PlayerViewModel.NextCommand}"
+                                    Background="Transparent" BorderThickness="0"
+                                    FontFamily="Segoe MDL2 Assets" Content="&#xE893;" Width="32" Height="32"/>
+                        </StackPanel>
+
+                        <Grid ColumnSpacing="8" HorizontalAlignment="Center" Width="360">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{x:Bind PlayerViewModel.PositionFormatted, Mode=OneWay}"
+                                       Style="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Center"
+                                       FontSize="11"/>
+                            <Slider Grid.Column="1" Value="{x:Bind PlayerViewModel.PositionSeconds, Mode=TwoWay}"
+                                    Minimum="0" Maximum="{x:Bind PlayerViewModel.DurationSeconds, Mode=OneWay}"
+                                    Height="3" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="2" Text="{x:Bind PlayerViewModel.DurationFormatted, Mode=OneWay}"
+                                       Style="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Center"
+                                       FontSize="11"/>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- Volume & Extra Controls -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="4" VerticalAlignment="Center">
+                        <Button Command="{x:Bind PlayerViewModel.ToggleShuffleCommand}"
+                                Background="Transparent" BorderThickness="0"
+                                FontFamily="Segoe MDL2 Assets" Content="&#xE8B1;"
+                                Width="32" Height="32"
+                                Opacity="{x:Bind PlayerViewModel.IsShuffled, Converter={StaticResource BoolToOpacity}, Mode=OneWay}"/>
+                        <Button Command="{x:Bind PlayerViewModel.ToggleRepeatCommand}"
+                                Background="Transparent" BorderThickness="0"
+                                FontFamily="Segoe MDL2 Assets" Content="&#xE8EE;"
+                                Width="32" Height="32"
+                                Opacity="{x:Bind PlayerViewModel.RepeatModeOpacity, Mode=OneWay}"/>
+
+                        <SymbolIcon Symbol="Volume" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                        <Slider Value="{x:Bind PlayerViewModel.Volume, Mode=TwoWay}"
+                                Minimum="0" Maximum="1" StepFrequency="0.05"
+                                Width="80" VerticalAlignment="Center"/>
+
+                        <Border Width="1" Height="20" Background="{ThemeResource DividerStrokeColorDefaultBrush}" Margin="4,0"/>
+
+                        <!-- EQ Toggle -->
+                        <Button Command="{x:Bind PlayerViewModel.ToggleEqualizerCommand}"
+                                ToolTipService.ToolTip="Equalizador"
+                                Background="Transparent" BorderThickness="0"
+                                FontFamily="Segoe MDL2 Assets" Content="&#xE189;"
+                                Width="32" Height="32"/>
+
+                        <!-- Lyrics Toggle -->
+                        <Button Command="{x:Bind PlayerViewModel.ToggleLyricsCommand}"
+                                ToolTipService.ToolTip="Letra"
+                                Background="Transparent" BorderThickness="0"
+                                FontFamily="Segoe MDL2 Assets" Content="&#xE8C1;"
+                                Width="32" Height="32"/>
+
+                        <!-- Queue -->
+                        <Button Command="{x:Bind PlayerViewModel.OpenQueueCommand}"
+                                ToolTipService.ToolTip="Fila"
+                                Background="Transparent" BorderThickness="0"
+                                FontFamily="Segoe MDL2 Assets" Content="&#xE8C9;"
+                                Width="32" Height="32"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Equalizer Panel -->
+                <Border Grid.Row="1" Visibility="{x:Bind PlayerViewModel.IsEqualizerOpen, Mode=OneWay}"
+                        Margin="0,8,0,0" Padding="12,8" CornerRadius="8"
+                        Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}">
+                    <StackPanel>
+                        <TextBlock Text="Equalizador" Style="{StaticResource BodyStrongTextBlockStyle}" Margin="0,0,0,8"/>
+                        <ItemsRepeater ItemsSource="{x:Bind PlayerViewModel.EqualizerBands, Mode=OneWay}">
+                            <ItemsRepeater.Layout><StackLayout Orientation="Horizontal" Spacing="8"/></ItemsRepeater.Layout>
+                            <ItemsRepeater.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel VerticalAlignment="Bottom" Spacing="2" HorizontalAlignment="Center">
+                                        <Slider Value="{Binding Gain, Mode=TwoWay}" Minimum="-12" Maximum="12"
+                                                Orientation="Vertical" Height="60" Width="20" StepFrequency="1"
+                                                TickFrequency="3" TickPlacement="None"/>
+                                        <TextBlock Text="{Binding Label}" Style="{StaticResource CaptionTextBlockStyle}"
+                                                   Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                                   HorizontalAlignment="Center" FontSize="9"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsRepeater.ItemTemplate>
+                        </ItemsRepeater>
+                    </StackPanel>
+                </Border>
+
+                <!-- Lyrics Panel -->
+                <ScrollViewer Grid.Row="1" Visibility="{x:Bind PlayerViewModel.IsLyricsOpen, Mode=OneWay}"
+                              MaxHeight="200" Margin="0,8,0,0">
+                    <TextBlock Text="{x:Bind PlayerViewModel.CurrentLyrics, Mode=OneWay}"
+                               Style="{StaticResource BodyTextBlockStyle}"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               LineHeight="22"
+                               TextWrapping="Wrap"/>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

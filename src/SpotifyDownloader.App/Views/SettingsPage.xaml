@@ -1,0 +1,112 @@
+<Page
+    x:Class="SpotifyDownloader.App.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:vm="using:SpotifyDownloader.App.ViewModels">
+
+    <ScrollViewer>
+        <Grid Padding="24" MaxWidth="800">
+            <StackPanel Spacing="16">
+                <TextBlock Text="Configurações" Style="{StaticResource TitleTextBlockStyle}"/>
+
+                <!-- Appearance -->
+                <TextBlock Text="Aparência" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0"/>
+                <Border CornerRadius="8" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" Padding="16">
+                    <StackPanel Spacing="12">
+                        <Grid ColumnSpacing="16">
+                            <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                            <ComboBox Header="Tema" ItemsSource="{x:Bind ViewModel.Themes}"
+                                      SelectedItem="{x:Bind ViewModel.SelectedTheme, Mode=TwoWay}" HorizontalAlignment="Stretch"/>
+                            <ComboBox Grid.Column="1" Header="Idioma" ItemsSource="{x:Bind ViewModel.Languages}"
+                                      SelectedItem="{x:Bind ViewModel.SelectedLanguage, Mode=TwoWay}" HorizontalAlignment="Stretch"/>
+                        </Grid>
+                        <TextBox Header="Cor de Destaque" Text="{x:Bind ViewModel.AccentColor, Mode=TwoWay}"/>
+                        <Grid ColumnSpacing="16">
+                            <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                            <ToggleSwitch Header="Efeito Mica" IsOn="{x:Bind ViewModel.UseMica, Mode=TwoWay}"/>
+                            <ToggleSwitch Grid.Column="1" Header="Acrílico" IsOn="{x:Bind ViewModel.UseAcrylic, Mode=TwoWay}"/>
+                        </Grid>
+                        <Slider Header="Transparência" Minimum="0.3" Maximum="1" StepFrequency="0.1"
+                                Value="{x:Bind ViewModel.WindowTransparency, Mode=TwoWay}"/>
+                        <Grid ColumnSpacing="16">
+                            <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                            <Slider Header="Cantos" Minimum="0" Maximum="20" StepFrequency="1"
+                                    Value="{x:Bind ViewModel.CornerRadius, Mode=TwoWay}"/>
+                            <Slider Grid.Column="1" Header="Fonte" Minimum="10" Maximum="24" StepFrequency="1"
+                                    Value="{x:Bind ViewModel.FontSize, Mode=TwoWay}"/>
+                        </Grid>
+                        <Grid ColumnSpacing="16">
+                            <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                            <ToggleSwitch Header="Modo Compacto" IsOn="{x:Bind ViewModel.CompactMode, Mode=TwoWay}"/>
+                            <ToggleSwitch Grid.Column="1" Header="Animações" IsOn="{x:Bind ViewModel.AnimationsEnabled, Mode=TwoWay}"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Download Settings -->
+                <TextBlock Text="Download" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0"/>
+                <Border CornerRadius="8" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" Padding="16">
+                    <StackPanel Spacing="12">
+                        <TextBox Header="Pasta de Saída" Text="{x:Bind ViewModel.OutputPath, Mode=TwoWay}" IsReadOnly="True"/>
+                        <Grid ColumnSpacing="16">
+                            <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                            <ComboBox Header="Formato" ItemsSource="{x:Bind ViewModel.Formats}"
+                                      SelectedItem="{x:Bind ViewModel.SelectedFormat, Mode=TwoWay}" HorizontalAlignment="Stretch"/>
+                            <ComboBox Grid.Column="1" Header="Qualidade" ItemsSource="{x:Bind ViewModel.Qualities}"
+                                      SelectedItem="{x:Bind ViewModel.SelectedQuality, Mode=TwoWay}" HorizontalAlignment="Stretch"/>
+                        </Grid>
+                        <muxc:NumberBox Header="Downloads Simultâneos" Minimum="1" Maximum="10" StepFrequency="1"
+                                         Value="{x:Bind ViewModel.MaxConcurrent, Mode=TwoWay}"/>
+                        <ToggleSwitch Header="Criar pastas por artista" IsOn="{x:Bind ViewModel.CreateArtistFolders, Mode=TwoWay}"/>
+                        <ToggleSwitch Header="Criar pastas por álbum" IsOn="{x:Bind ViewModel.CreateAlbumFolders, Mode=TwoWay}"/>
+                        <ToggleSwitch Header="Inserir capa" IsOn="{x:Bind ViewModel.EmbedCoverArt, Mode=TwoWay}"/>
+                        <ToggleSwitch Header="Salvar metadados" IsOn="{x:Bind ViewModel.SaveMetadata, Mode=TwoWay}"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Behavior -->
+                <TextBlock Text="Comportamento" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0"/>
+                <Border CornerRadius="8" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" Padding="16">
+                    <StackPanel Spacing="8">
+                        <ToggleSwitch Header="Minimizar para bandeja" IsOn="{x:Bind ViewModel.MinimizeToTray, Mode=TwoWay}"/>
+                        <ToggleSwitch Header="Fechar para bandeja" IsOn="{x:Bind ViewModel.CloseToTray, Mode=TwoWay}"/>
+                        <ToggleSwitch Header="Iniciar minimizado" IsOn="{x:Bind ViewModel.StartMinimized, Mode=TwoWay}"/>
+                        <ToggleSwitch Header="Notificações" IsOn="{x:Bind ViewModel.ShowNotifications, Mode=TwoWay}"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Cache -->
+                <TextBlock Text="Cache" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0"/>
+                <Border CornerRadius="8" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" Padding="16">
+                    <StackPanel Spacing="8">
+                        <ToggleSwitch Header="Cache habilitado" IsOn="{x:Bind ViewModel.CacheEnabled, Mode=TwoWay}"/>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="{x:Bind ViewModel.CacheSize, Mode=OneWay}" VerticalAlignment="Center"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                            <Button Command="{x:Bind ViewModel.ClearCacheCommand}" Content="Limpar Cache"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Stats -->
+                <TextBlock Text="Estatísticas" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,8,0,0"/>
+                <Border CornerRadius="8" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" Padding="16">
+                    <Grid ColumnSpacing="16">
+                        <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                        <StackPanel><TextBlock Text="Total" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/><TextBlock Text="{x:Bind ViewModel.HistoryTotal, Mode=OneWay}" Style="{StaticResource BodyStrongTextBlockStyle}"/></StackPanel>
+                        <StackPanel Grid.Column="1"><TextBlock Text="Sucesso" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/><TextBlock Text="{x:Bind ViewModel.HistorySuccessful, Mode=OneWay}" Style="{StaticResource BodyStrongTextBlockStyle}" Foreground="#1DB954"/></StackPanel>
+                        <StackPanel Grid.Column="2"><TextBlock Text="Falhas" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/><TextBlock Text="{x:Bind ViewModel.HistoryFailed, Mode=OneWay}" Style="{StaticResource BodyStrongTextBlockStyle}" Foreground="#E74C3C"/></StackPanel>
+                        <StackPanel Grid.Column="3"><TextBlock Text="Total" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/><TextBlock Text="{x:Bind ViewModel.HistoryTotalSize, Mode=OneWay}" Style="{StaticResource BodyStrongTextBlockStyle}"/></StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Actions -->
+                <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,8,0,24">
+                    <Button Command="{x:Bind ViewModel.SaveCommand}" Content="Salvar" Style="{StaticResource AccentButtonStyle}"/>
+                    <Button Command="{x:Bind ViewModel.ResetCommand}" Content="Restaurar Padrões"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</Page>

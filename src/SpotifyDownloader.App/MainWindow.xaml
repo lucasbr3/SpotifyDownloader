@@ -1,0 +1,7 @@
+<muxc:Window
+    x:Class="SpotifyDownloader.App.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:muxc="using:Microsoft.UI.Xaml"
+    Title="Spotify Downloader">
+</muxc:Window>

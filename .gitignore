@@ -1,0 +1,28 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.log
+*.vs/
+
+## Build outputs
+Release/
+Installer/
+AppPackages/
+*.msix
+*.msixupload
+
+## IDE
+.vs/
+*.sln.DotSettings.user
+*.DotSettings.user
+
+## OS
+Thumbs.db
+.DS_Store
+
+## Temp
+logs/
+updates/

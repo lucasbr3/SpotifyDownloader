@@ -1,0 +1,82 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="using:SpotifyDownloader.App.Converters">
+
+    <!-- Converters -->
+    <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    <converters:BoolToVisibilityConverter x:Key="InvertBoolToVisibility"/>
+    <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
+    <converters:BoolToOpacityConverter x:Key="BoolToOpacity"/>
+    <converters:ZeroToVisibilityConverter x:Key="ZeroToVisibilityConverter"/>
+    <converters:DownloadStatusToColorConverter x:Key="DownloadStatusToColorConverter"/>
+    <converters:QualityToStringConverter x:Key="QualityToStringConverter"/>
+    <converters:FormatToStringConverter x:Key="FormatToStringConverter"/>
+    <converters:DateTimeToStringConverter x:Key="DateTimeToStringConverter"/>
+
+    <!-- Button Styles -->
+    <Style x:Key="AccentButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="{ThemeResource AccentButtonBackground}"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="Padding" Value="16,8"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+
+    <Style x:Key="SecondaryButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorSecondaryBrush}"/>
+        <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}"/>
+        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="Padding" Value="16,8"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+
+    <!-- TextBox -->
+    <Style x:Key="SettingsTextBoxStyle" TargetType="TextBox">
+        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="Padding" Value="10,6"/>
+        <Setter Property="PlaceholderForeground" Value="{ThemeResource TextFillColorTertiaryBrush}"/>
+    </Style>
+
+    <!-- ToggleSwitch -->
+    <Style x:Key="SettingsToggleStyle" TargetType="ToggleSwitch">
+        <Setter Property="OnContent" Value=""/>
+        <Setter Property="OffContent" Value=""/>
+    </Style>
+
+    <!-- Slider -->
+    <Style x:Key="SettingsSliderStyle" TargetType="Slider">
+        <Setter Property="Minimum" Value="0"/>
+        <Setter Property="Maximum" Value="100"/>
+        <Setter Property="StepFrequency" Value="1"/>
+    </Style>
+
+    <!-- NavigationViewItem -->
+    <Style x:Key="NavViewItemStyle" TargetType="NavigationViewItem">
+        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="Margin" Value="4,2"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+
+    <!-- ProgressBar -->
+    <Style x:Key="PlayerProgressStyle" TargetType="ProgressBar">
+        <Setter Property="Height" Value="4"/>
+        <Setter Property="CornerRadius" Value="2"/>
+        <Setter Property="Background" Value="{ThemeResource SubtleFillColorDisabledBrush}"/>
+        <Setter Property="Foreground" Value="{ThemeResource AccentButtonBackground}"/>
+    </Style>
+
+    <!-- Card border -->
+    <Style x:Key="CardBorderStyle" TargetType="Border">
+        <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}"/>
+        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="Padding" Value="12"/>
+    </Style>
+
+    <!-- ScrollBar -->
+    <Style x:Key="ThinScrollBarStyle" TargetType="ScrollViewer">
+        <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
+        <Setter Property="HorizontalScrollBarVisibility" Value="Disabled"/>
+    </Style>
+</ResourceDictionary>

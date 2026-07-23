@@ -1,0 +1,34 @@
+<Page
+    x:Class="SpotifyDownloader.App.Views.PlaylistsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:core="using:SpotifyDownloader.Core.Models">
+
+    <Grid Padding="24">
+        <TextBlock Text="Playlists" Style="{StaticResource TitleTextBlockStyle}" Margin="0,0,0,16"/>
+
+        <muxc:ItemsRepeater ItemsSource="{x:Bind ViewModel.Playlists, Mode=OneWay}" Margin="0,16,0,0">
+            <muxc:ItemsRepeater.Layout>
+                <UniformGridLayout MinItemWidth="280" MinItemHeight="80" Orientation="Horizontal"/>
+            </muxc:ItemsRepeater.Layout>
+            <muxc:ItemsRepeater.ItemTemplate>
+                <DataTemplate x:DataType="core:SpotifyPlaylist">
+                    <Grid Padding="12" CornerRadius="8" ColumnSpacing="12"
+                          Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" Margin="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="64"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Image Source="{x:Bind CoverUrl}" Width="64" Height="64" CornerRadius="6"/>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="{x:Bind Name}" Style="{StaticResource BodyStrongTextBlockStyle}" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Text="{x:Bind Owner}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                            <TextBlock Text="{x:Bind TrackCount, StringFormat='{0} músicas'}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorTertiaryBrush}"/>
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </muxc:ItemsRepeater.ItemTemplate>
+        </muxc:ItemsRepeater>
+    </Grid>
+</Page>

@@ -1,0 +1,72 @@
+<Page
+    x:Class="SpotifyDownloader.App.Views.LibraryPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:core="using:SpotifyDownloader.Core.Models">
+
+    <Grid Padding="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Title + Search Bar -->
+        <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,0,0,16">
+            <TextBlock Text="Biblioteca" Style="{StaticResource TitleTextBlockStyle}" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <!-- Link Input + Search Button -->
+        <Grid Grid.Row="1" ColumnSpacing="8" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="LinkInput" PlaceholderText="Cole um link do Spotify..." 
+                     Style="{StaticResource SettingsTextBoxStyle}"
+                     Text="{x:Bind ViewModel.SpotifyLink, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <Button Grid.Column="1" Command="{x:Bind ViewModel.SearchOrPasteCommand}"
+                    Content="Buscar" Style="{StaticResource AccentButtonStyle}" Width="100"/>
+        </Grid>
+
+        <!-- Quick Access Cards -->
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Olá, bem-vindo!" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,16"/>
+
+            <muxc:ItemsRepeater Grid.Row="1" Margin="0,0,0,24">
+                <muxc:ItemsRepeater.ItemsSource>
+                    <x:Array Type="x:String">
+                        <x:String>Playlists</x:String>
+                        <x:String>Álbuns Salvos</x:String>
+                        <x:String>Músicas Curtidas</x:String>
+                        <x:String>Artistas</x:String>
+                    </x:Array>
+                </muxc:ItemsRepeater.ItemsSource>
+                <muxc:ItemsRepeater.Layout>
+                    <UniformGridLayout MinItemWidth="180" MinItemHeight="160" Orientation="Horizontal"/>
+                </muxc:ItemsRepeater.Layout>
+                <muxc:ItemsRepeater.ItemTemplate>
+                    <DataTemplate x:DataType="x:String">
+                        <Border CornerRadius="12" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                Padding="16" Margin="4">
+                            <StackPanel VerticalAlignment="Bottom">
+                                <SymbolIcon Symbol="MusicInfo" Width="32" Height="32"/>
+                                <TextBlock Text="{x:Bind}" Style="{StaticResource BodyStrongTextBlockStyle}" Margin="0,8,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </muxc:ItemsRepeater.ItemTemplate>
+            </muxc:ItemsRepeater>
+
+            <TextBlock Grid.Row="2" Text="Destaques" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,8"/>
+        </Grid>
+    </Grid>
+</Page>
