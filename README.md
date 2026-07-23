@@ -1,52 +1,68 @@
 # Spotify Downloader
 
-Baixe músicas, álbuns e playlists do Spotify sem necessidade de autenticação.
-
-Powered by .NET 8 + WinUI 3 + FFmpeg.
+A Windows desktop application for downloading music from Spotify without requiring authentication.
 
 ## Features
 
-- Pesquisa em tempo real com AutoSuggest
-- Cards com álbum, artista, duração
-- Player completo com equalizador, letras e mini player
-- Espectro visualizador animado
-- Tema escuro, claro e 7 cores (AMOLED, Azul, Verde, Roxo, Vermelho, Laranja)
-- Multi-idioma: Português, English, Español
-- Histórico de downloads com estatísticas
-- Auto-update via GitHub Releases
+- Search tracks, albums, and playlists
+- Download audio in multiple formats (MP3, FLAC, WAV, M4A, OGG)
+- Built-in audio player with equalizer and lyrics
+- Mini player with spectrum visualization
+- 9 themes with Mica/Acrylic effects
+- Multi-language support (Portuguese, English, Spanish)
+- FFmpeg auto-download on first run (no manual installation needed)
 
-## Como usar
+## Requirements
 
-1. **Baixe a última versão** na [página de releases](https://github.com/anomalyco/SpotifyDownloader/releases)
-2. **Instale o FFmpeg** (necessário para conversão de áudio)
-   - Baixe de: https://ffmpeg.org/download.html
-   - Coloque `ffmpeg.exe` na mesma pasta do executável ou adicione ao PATH
-3. Execute `SpotifyDownloader.exe`
+- Windows 10 (build 19041+) or Windows 11
+- No Spotify credentials needed
+- No manual FFmpeg installation needed (auto-downloaded)
 
-## Compilando do código-fonte
+## Installation
 
-### Pré-requisitos
-- [Visual Studio 2022](https://visualstudio.microsoft.com/) (carga: "Desenvolvimento da Plataforma Universal do Windows")
-- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
-- [Git](https://git-scm.com/)
+### Download Installer
 
-### Passos
+Download the latest `SpotifyDownloader_Setup_v*.exe` from [Releases](https://github.com/lucasbr3/SpotifyDownloader/releases).
 
-```powershell
-git clone https://github.com/anomalyco/SpotifyDownloader.git
-cd SpotifyDownloader
-dotnet restore -p:Platform=x64
-dotnet build -c Release -p:Platform=x64
+Run the installer and follow the wizard. The app is ready to use immediately.
+
+### Build from Source
+
+1. Install Visual Studio 2022 with:
+   - .NET 8 SDK
+   - Windows App SDK
+   - Windows 10 SDK (10.0.19041.0)
+
+2. Run:
+   ```
+   build.cmd
+   ```
+
+3. Output: `Release\SpotifyDownloader.exe`
+
+## How It Works
+
+- **Metadata**: Extracted from public YouTube search results and Spotify page meta tags
+- **Downloads**: YouTube audio extracted via FFmpeg
+- **FFmpeg**: Downloaded automatically on first launch if not present
+
+## Tech Stack
+
+- C# .NET 8 + WinUI 3
+- MVVM with CommunityToolkit.Mvvm
+- FFmpeg for audio processing
+- TagLibSharp for metadata embedding
+- Serilog for logging
+
+## Project Structure
+
 ```
-
-O executável estará em:
-`src\SpotifyDownloader.App\bin\x64\Release\net8.0-windows10.0.19041.0\SpotifyDownloader.exe`
-
-### Instaladores
-
-- **Inno Setup**: `ISCC.exe installer.iss` (requer [Inno Setup 6](https://jrsoftware.org/isdl.php))
-- **MSIX**: compile com `/p:AppxPackage=true` no MSBuild, ou use o Visual Studio
-
-## Licença
-
-Este projeto é fornecido apenas para fins educacionais.
+SpotifyDownloader/
+├── src/
+│   ├── SpotifyDownloader.Core/     # Models, interfaces, services
+│   └── SpotifyDownloader.App/      # WinUI 3 UI, views, viewmodels
+├── assets/                         # Icons and resources
+├── installer.iss                   # Inno Setup script
+├── build.ps1 / build.cmd           # Build scripts
+└── .github/workflows/build.yml     # CI/CD pipeline
+```

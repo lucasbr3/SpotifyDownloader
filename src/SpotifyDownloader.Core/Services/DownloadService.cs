@@ -36,7 +36,9 @@ public class DownloadService : IDownloadService
     public int ActiveDownloadCount => _activeDownloads.Count;
 
     public event EventHandler<DownloadItem>? DownloadStarted;
+    #pragma warning disable CS0067
     public event EventHandler<DownloadItem>? DownloadProgressChanged;
+    #pragma warning restore CS0067
     public event EventHandler<DownloadItem>? DownloadCompleted;
     public event EventHandler<DownloadItem>? DownloadFailed;
     public event EventHandler<DownloadItem>? DownloadPaused;
@@ -79,7 +81,7 @@ public class DownloadService : IDownloadService
                     return item;
                 }
 
-                var outputFile = BuildOutputPath(track, outputPath, format);
+                var outputFile = BuildOutputPath(track, outputPath, format, true, true);
                 Directory.CreateDirectory(Path.GetDirectoryName(outputFile)!);
 
                 item.Status = DownloadStatus.Converting;
@@ -127,7 +129,8 @@ public class DownloadService : IDownloadService
             _activeDownloads.TryRemove(item.Id, out _);
             _tokens.TryRemove(item.Id, out _);
             _totalDownloads++;
-            SaveHistoryAsync().ConfigureAwait(false);
+            _history.Add(item);
+            _ = SaveHistoryAsync();
         }
 
         return item;
@@ -261,25 +264,11 @@ public class DownloadService : IDownloadService
             .ToList();
     }
 
-    public async Task<bool> IsFfmpegAvailableAsync()
+        public async Task<bool> IsFfmpegAvailableAsync()
     {
         try
         {
-            var process = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = "ffmpeg",
-                    Arguments = "-version",
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true
-                }
-            };
-            process.Start();
-            await process.WaitForExitAsync();
-            return process.ExitCode == 0;
+            return await FfmpegService.IsAvailableAsync();
         }
         catch
         {
@@ -289,39 +278,7 @@ public class DownloadService : IDownloadService
 
     public async Task<string> GetFfmpegPathAsync()
     {
-        var paths = new[]
-        {
-            "ffmpeg",
-            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ffmpeg.exe"),
-            @"C:\ffmpeg\bin\ffmpeg.exe",
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
-                "ffmpeg", "bin", "ffmpeg.exe")
-        };
-
-        foreach (var path in paths)
-        {
-            try
-            {
-                var process = new Process
-                {
-                    StartInfo = new ProcessStartInfo
-                    {
-                        FileName = path,
-                        Arguments = "-version",
-                        UseShellExecute = false,
-                        CreateNoWindow = true,
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true
-                    }
-                };
-                process.Start();
-                await process.WaitForExitAsync();
-                if (process.ExitCode == 0) return path;
-            }
-            catch { }
-        }
-
-        return "ffmpeg";
+        return await FfmpegService.GetFfmpegPathAsync();
     }
 
     private async Task<string?> FindAudioSourceAsync(SpotifyTrack track, CancellationToken ct)
@@ -370,7 +327,7 @@ public class DownloadService : IDownloadService
 
             item.OutputPath = finalPath;
 
-            var process = new Process
+            using var process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
@@ -399,7 +356,7 @@ public class DownloadService : IDownloadService
         }
     }
 
-    private static string BuildOutputPath(SpotifyTrack track, string basePath, AudioFormat format)
+    private static string BuildOutputPath(SpotifyTrack track, string basePath, AudioFormat format, bool createArtistFolders = true, bool createAlbumFolders = true)
     {
         var extension = GetExtension(format);
         var sanitizedTitle = SanitizeFileName(track.Title);
@@ -408,10 +365,10 @@ public class DownloadService : IDownloadService
 
         var path = basePath;
 
-        if (true) // CreateArtistFolders
+        if (createArtistFolders && !string.IsNullOrEmpty(sanitizedArtist))
             path = Path.Combine(path, sanitizedArtist);
 
-        if (true) // CreateAlbumFolders
+        if (createAlbumFolders && !string.IsNullOrEmpty(sanitizedAlbum))
             path = Path.Combine(path, sanitizedAlbum);
 
         var filename = $"{track.TrackNumber:D2} - {sanitizedTitle}.{extension}";

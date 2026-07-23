@@ -5,7 +5,7 @@ namespace SpotifyDownloader.App.Views;
 
 public sealed partial class DownloadsPage : Page
 {
-    public DownloadsViewModel ViewModel { get; } = new();
+    public DownloadsViewModel ViewModel { get; } = App.GetService<DownloadsViewModel>()!;
 
     public DownloadsPage()
     {

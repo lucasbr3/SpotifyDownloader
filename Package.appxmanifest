@@ -19,7 +19,7 @@
   </Resources>
 
   <Dependencies>
-    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19041.0" MaxVersionTested="10.0.22621.0" />
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19041.0" MaxVersionTested="10.0.26100.0" />
   </Dependencies>
 
   <Capabilities>
@@ -32,10 +32,10 @@
       <uap:VisualElements
         DisplayName="Spotify Downloader"
         Description="Baixe músicas do Spotify sem autenticação"
-        Square150x150Logo="Assets\icon.png"
-        Square44x44Logo="Assets\icon.png"
+        Square150x150Logo="Assets\icon_256x256.png"
+        Square44x44Logo="Assets\icon_48x48.png"
         BackgroundColor="transparent">
-        <uap:DefaultTile Wide310x150Logo="Assets\icon.png" Square71x71Logo="Assets\icon.png" />
+        <uap:DefaultTile Wide310x150Logo="Assets\icon_256x256.png" Square71x71Logo="Assets\icon_96x96.png" />
       </uap:VisualElements>
     </Application>
   </Applications>

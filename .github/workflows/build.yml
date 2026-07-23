@@ -32,6 +32,17 @@ jobs:
       - name: Add MSBuild to PATH
         uses: microsoft/setup-msbuild@v2
 
+      - name: Install Windows SDK 10.0.19041
+        shell: pwsh
+        run: |
+          $url = "https://go.microsoft.com/fwlink/p/?linkid=2120843"
+          $installer = "$env:TEMP\winsdk.exe"
+          Write-Host "Downloading Windows SDK 10.0.19041..."
+          Invoke-WebRequest -Uri $url -OutFile $installer -UseBasicParsing
+          Write-Host "Installing Windows SDK..."
+          Start-Process -FilePath $installer -ArgumentList "/features + /quiet" -Wait -NoNewWindow
+          Write-Host "Windows SDK installation completed"
+
       - name: Install Inno Setup
         run: choco install innosetup --no-progress -y
 
@@ -43,60 +54,19 @@ jobs:
             -KeyUsage DigitalSignature `
             -FriendlyName "SpotifyDownloaderCert" `
             -CertStoreLocation "Cert:\CurrentUser\My" `
-            -TextExtension @("2.5.29.37={text}1.3.6.1.5.5.7.3.3", "2.5.29.19={text}Subject Type=End Entity")
+            -TextExtension @("2.5.29.37={text}1.3.6.1.5.5.7.3.3", "2.5.29.19={text}SubjectType=EndEntity")
           $thumbprint = $cert.Thumbprint
           Write-Host "Certificate thumbprint: $thumbprint"
           echo "CERT_THUMBPRINT=$thumbprint" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Restore NuGet packages
-        run: >
-          dotnet restore SpotifyDownloader.sln
-          -p:Platform=${{ env.PLATFORM }}
+        run: dotnet restore SpotifyDownloader.sln -p:Platform=${{ env.PLATFORM }}
 
       - name: Build Core (class library)
-        run: >
-          dotnet build src/SpotifyDownloader.Core/SpotifyDownloader.Core.csproj
-          -c ${{ env.CONFIGURATION }}
-          -p:Platform=${{ env.PLATFORM }}
-          --no-restore
-          -warnaserror-
+        run: dotnet build src/SpotifyDownloader.Core/SpotifyDownloader.Core.csproj -c ${{ env.CONFIGURATION }} -p:Platform=${{ env.PLATFORM }} --no-restore
 
       - name: Build App (WinUI 3)
-        run: >
-          dotnet build src/SpotifyDownloader.App/SpotifyDownloader.App.csproj
-          -c ${{ env.CONFIGURATION }}
-          -p:Platform=${{ env.PLATFORM }}
-          --no-restore
-          -warnaserror-
-
-      - name: Package MSIX (may fail if Windows SDK is incomplete)
-        continue-on-error: true
-        shell: pwsh
-        run: |
-          $slnDir = "${{ github.workspace }}"
-          $proj = "$slnDir\src\SpotifyDownloader.App\SpotifyDownloader.App.csproj"
-          $msbuild = "${env:ProgramFiles}\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\MSBuild.exe"
-          if (-not (Test-Path $msbuild)) {
-            $msbuild = "${env:ProgramFiles}\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe"
-          }
-          if (-not (Test-Path $msbuild)) {
-            Write-Warning "MSBuild not found at expected paths, trying msbuild from PATH"
-            $msbuild = "msbuild"
-          }
-          Write-Host "Using MSBuild: $msbuild"
-          & $msbuild $proj `
-            /t:Build `
-            /p:Configuration=${{ env.CONFIGURATION }} `
-            /p:Platform=${{ env.PLATFORM }} `
-            /p:AppxPackage=true `
-            /p:AppxBundle=Never `
-            /p:UapAppxPackageBuildMode=CI `
-            /p:AppxPackageDir="$slnDir\AppPackages\" `
-            /p:PackageCertificateThumbprint=$env:CERT_THUMBPRINT `
-            /p:NoWarn=APPX2009 `
-            /restore `
-            /verbosity:minimal
-          Write-Host "MSIX build exit code: $LASTEXITCODE"
+        run: dotnet build src/SpotifyDownloader.App/SpotifyDownloader.App.csproj -c ${{ env.CONFIGURATION }} -p:Platform=${{ env.PLATFORM }} --no-restore
 
       - name: Prepare Release folder
         shell: pwsh
@@ -108,15 +78,12 @@ jobs:
             Copy-Item "$src\*" $release -Recurse -Force -ErrorAction SilentlyContinue
             Remove-Item "$release\*.pdb" -Force -ErrorAction SilentlyContinue
             Remove-Item "$release\*.xml" -Force -ErrorAction SilentlyContinue
+            Remove-Item "$release\*.config" -Force -ErrorAction SilentlyContinue
           } else {
             Write-Warning "Build output not found at: $src"
           }
-          Copy-Item "${{ github.workspace }}\Assets\icon.ico" "$release\" -Force -ErrorAction SilentlyContinue
-          @"
-FFmpeg is required for audio conversion.
-Download from: https://ffmpeg.org/download.html
-Place ffmpeg.exe in the same folder as SpotifyDownloader.exe or add to PATH.
-"@ | Out-File "$release\FFMPEG_README.txt" -Encoding utf8
+          Write-Host "Release folder contains:"
+          Get-ChildItem -Path $release -Recurse | Select-Object Name, Length | Format-Table -AutoSize
 
       - name: Compile Inno Setup installer
         shell: pwsh
@@ -125,9 +92,12 @@ Place ffmpeg.exe in the same folder as SpotifyDownloader.exe or add to PATH.
           if (Test-Path $issPath) {
             $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
             if (-not (Test-Path $iscc)) {
+              $iscc = "${env:ProgramFiles}\Inno Setup 6\ISCC.exe"
+            }
+            if (-not (Test-Path $iscc)) {
               $iscc = "ISCC.exe"
             }
-            Write-Host "Compiling Inno Setup script..."
+            Write-Host "Using ISCC: $iscc"
             & $iscc $issPath
             Write-Host "Inno Setup exit code: $LASTEXITCODE"
           } else {
@@ -141,20 +111,7 @@ Place ffmpeg.exe in the same folder as SpotifyDownloader.exe or add to PATH.
           path: |
             ${{ github.workspace }}\Release\**\*
             ${{ github.workspace }}\Installer\*.exe
-            ${{ github.workspace }}\AppPackages\**\*.msix
-            ${{ github.workspace }}\AppPackages\**\*.msixupload
-            ${{ github.workspace }}\src\SpotifyDownloader.App\bin\${{ env.PLATFORM }}\${{ env.CONFIGURATION }}\AppPackages\**\*
           compression-level: 9
-
-      - name: Upload MSIX package separately
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: SpotifyDownloader-MSIX
-          path: |
-            ${{ github.workspace }}\AppPackages\**\*.msix
-            ${{ github.workspace }}\src\SpotifyDownloader.App\bin\${{ env.PLATFORM }}\${{ env.CONFIGURATION }}\AppPackages\**\*.msix
-          compression-level: 0
 
       - name: Upload Inno Setup installer
         if: always()
@@ -170,5 +127,4 @@ Place ffmpeg.exe in the same folder as SpotifyDownloader.exe or add to PATH.
         with:
           files: |
             ${{ github.workspace }}\Installer\*.exe
-            ${{ github.workspace }}\AppPackages\**\*.msix
           generate_release_notes: true

@@ -198,14 +198,14 @@ public class MetadataService : IMetadataService
         return null;
     }
 
-    public async Task<SpotifyTrack?> ExtractMetadataFromYouTubeAsync(string videoUrl)
+    public Task<SpotifyTrack?> ExtractMetadataFromYouTubeAsync(string videoUrl)
     {
         try
         {
             var videoId = ExtractVideoIdFromUrl(videoUrl);
-            if (string.IsNullOrEmpty(videoId)) return null;
+            if (string.IsNullOrEmpty(videoId)) return Task.FromResult<SpotifyTrack?>(null);
 
-            return new SpotifyTrack
+            return Task.FromResult<SpotifyTrack?>(new SpotifyTrack
             {
                 Id = videoId,
                 Title = $"YouTube Video {videoId}",
@@ -215,12 +215,12 @@ public class MetadataService : IMetadataService
                 AlbumCoverUrlHd = $"https://img.youtube.com/vi/{videoId}/maxresdefault.jpg",
                 SpotifyUri = videoUrl,
                 IsPlayable = true
-            };
+            });
         }
         catch (Exception ex)
         {
             Log.Error(ex, "Failed to extract YouTube metadata");
-            return null;
+            return Task.FromResult<SpotifyTrack?>(null);
         }
     }
 

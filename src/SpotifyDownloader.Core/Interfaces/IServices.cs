@@ -208,6 +208,8 @@ public interface IThemeService
     void ApplyUiScale(double scale);
     void ToggleMica(bool enable);
     void ToggleAcrylic(bool enable);
+    void ApplyMica(bool enable);
+    void ApplyAcrylic(bool enable);
     void ApplyAll(ThemeSettings settings);
     bool IsMicaSupported { get; }
     bool IsAcrylicSupported { get; }

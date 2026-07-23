@@ -9,7 +9,7 @@ namespace SpotifyDownloader.App;
 public sealed partial class MiniPlayerWindow : Window
 {
     private readonly IPlayerService _player;
-    private readonly Timer? _updateTimer;
+    private Timer? _updateTimer;
     private readonly Border[] _spectrumBars;
 
     public MiniPlayerWindow()
@@ -27,6 +27,7 @@ public sealed partial class MiniPlayerWindow : Window
         AppWindow.MinSize = new SizeInt32(320, 500);
 
         _player.PlayStateChanged += OnPlayStateChanged;
+        Closed += OnClosed;
 
         _spectrumBars = new Border[32];
         for (int i = 0; i < 32; i++)
@@ -41,6 +42,13 @@ public sealed partial class MiniPlayerWindow : Window
         }, null, 0, 200);
 
         UpdateUI();
+    }
+
+    private void OnClosed(object sender, WindowEventArgs args)
+    {
+        _player.PlayStateChanged -= OnPlayStateChanged;
+        _updateTimer?.Dispose();
+        _updateTimer = null;
     }
 
     private void UpdateUI()

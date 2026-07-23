@@ -42,7 +42,7 @@ public class AudioConverterService : IAudioConverterService
     {
         try
         {
-            var ffmpeg = await FindFfmpegAsync();
+            var ffmpeg = await FfmpegService.GetFfmpegPathAsync();
             var bitrate = (int)quality;
             var codec = GetCodec(targetFormat);
             var extension = GetExtension(targetFormat);
@@ -51,7 +51,7 @@ public class AudioConverterService : IAudioConverterService
             var args = $"-i \"{inputPath}\" -codec:a {codec} -b:a {bitrate}k " +
                        $"-map 0:a -id3v2_version 3 -write_id3v1 1 -y \"{finalPath}\"";
 
-            var process = new Process
+            using var process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
@@ -126,8 +126,8 @@ public class AudioConverterService : IAudioConverterService
         {
             if (!File.Exists(filePath)) return false;
 
-            var ffmpeg = await FindFfmpegAsync();
-            var process = new Process
+            var ffmpeg = await FfmpegService.GetFfmpegPathAsync();
+            using var process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
@@ -169,40 +169,4 @@ public class AudioConverterService : IAudioConverterService
         return (long)(durationSec * bitrate * 1000 / 8 * overhead);
     }
 
-    private static async Task<string> FindFfmpegAsync()
-    {
-        var paths = new[]
-        {
-            "ffmpeg",
-            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ffmpeg.exe"),
-            @"C:\ffmpeg\bin\ffmpeg.exe",
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
-                "ffmpeg", "bin", "ffmpeg.exe")
-        };
-
-        foreach (var path in paths)
-        {
-            try
-            {
-                var process = new Process
-                {
-                    StartInfo = new ProcessStartInfo
-                    {
-                        FileName = path,
-                        Arguments = "-version",
-                        UseShellExecute = false,
-                        CreateNoWindow = true,
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true
-                    }
-                };
-                process.Start();
-                await process.WaitForExitAsync();
-                if (process.ExitCode == 0) return path;
-            }
-            catch { }
-        }
-
-        return "ffmpeg";
-    }
 }

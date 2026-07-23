@@ -81,7 +81,7 @@
                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                 BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
                 BorderThickness="0,1,0,0"
-                Visibility="{x:Bind PlayerViewModel.HasTrack, Converter={StaticResource BoolToVisibility}, Mode=OneWay}">
+                Visibility="{x:Bind PlayerViewModel.HasTrack, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}">
             <Grid x:Name="PlayerBar" Padding="12,8">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
@@ -191,7 +191,7 @@
                 </Grid>
 
                 <!-- Equalizer Panel -->
-                <Border Grid.Row="1" Visibility="{x:Bind PlayerViewModel.IsEqualizerOpen, Mode=OneWay}"
+                <Border Grid.Row="1" Visibility="{x:Bind PlayerViewModel.IsEqualizerOpen, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
                         Margin="0,8,0,0" Padding="12,8" CornerRadius="8"
                         Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}">
                     <StackPanel>
@@ -215,7 +215,7 @@
                 </Border>
 
                 <!-- Lyrics Panel -->
-                <ScrollViewer Grid.Row="1" Visibility="{x:Bind PlayerViewModel.IsLyricsOpen, Mode=OneWay}"
+                <ScrollViewer Grid.Row="1" Visibility="{x:Bind PlayerViewModel.IsLyricsOpen, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
                               MaxHeight="200" Margin="0,8,0,0">
                     <TextBlock Text="{x:Bind PlayerViewModel.CurrentLyrics, Mode=OneWay}"
                                Style="{StaticResource BodyTextBlockStyle}"

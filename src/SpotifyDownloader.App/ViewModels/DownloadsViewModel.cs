@@ -172,9 +172,10 @@ public partial class DownloadsViewModel : ObservableObject
                 if (index >= 0)
                 {
                     ActiveDownloads[index] = item;
-                    OnPropertyChanged(nameof(item.ProgressPercent));
-                    OnPropertyChanged(nameof(item.SpeedFormatted));
-                    OnPropertyChanged(nameof(item.RemainingTimeFormatted));
+                    var collection = ActiveDownloads;
+                    var oldItem = collection[index];
+                    collection.RemoveAt(index);
+                    collection.Insert(index, item);
                 }
             }
         });
@@ -203,7 +204,16 @@ public partial class DownloadsViewModel : ObservableObject
     {
         App.MainWindow?.DispatcherQueue.TryEnqueue(() =>
         {
-            OnPropertyChanged(nameof(item.StatusText));
+            var existing = ActiveDownloads.FirstOrDefault(d => d.Id == item.Id);
+            if (existing != null)
+            {
+                var index = ActiveDownloads.IndexOf(existing);
+                if (index >= 0)
+                {
+                    ActiveDownloads.RemoveAt(index);
+                    ActiveDownloads.Insert(index, item);
+                }
+            }
         });
     }
 
@@ -211,7 +221,16 @@ public partial class DownloadsViewModel : ObservableObject
     {
         App.MainWindow?.DispatcherQueue.TryEnqueue(() =>
         {
-            OnPropertyChanged(nameof(item.StatusText));
+            var existing = ActiveDownloads.FirstOrDefault(d => d.Id == item.Id);
+            if (existing != null)
+            {
+                var index = ActiveDownloads.IndexOf(existing);
+                if (index >= 0)
+                {
+                    ActiveDownloads.RemoveAt(index);
+                    ActiveDownloads.Insert(index, item);
+                }
+            }
         });
     }
 

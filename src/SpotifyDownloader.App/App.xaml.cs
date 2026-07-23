@@ -23,6 +23,8 @@ public partial class App : WinUIApplication
     private static IPlayerService? _player;
     private static ILyricsService? _lyrics;
     private static IUpdateService? _updater;
+    private static DownloadsViewModel? _downloadsViewModel;
+    private static PlayerViewModel? _playerViewModel;
 
     public static ICacheService Cache => _cache ??= new CacheService();
     public static IMetadataService Metadata => _metadata ??= new MetadataService(Cache);
@@ -43,9 +45,9 @@ public partial class App : WinUIApplication
         if (typeof(T) == typeof(MainViewModel))
             return ((Current as App)?._window?.Content as MainPage)?.ViewModel as T;
         if (typeof(T) == typeof(PlayerViewModel))
-            return ((Current as App)?._window?.Content as MainPage)?.PlayerViewModel as T;
+            return _playerViewModel as T;
         if (typeof(T) == typeof(DownloadsViewModel))
-            return new DownloadsViewModel() as T;
+            return (_downloadsViewModel ??= new DownloadsViewModel()) as T;
         return null;
     }
 
@@ -73,10 +75,10 @@ public partial class App : WinUIApplication
 
         var playerService = new PlayerService();
         _player = playerService;
-        var playerViewModel = new PlayerViewModel(playerService);
+        _playerViewModel = new PlayerViewModel(playerService);
 
         var mainViewModel = new MainViewModel();
-        _window.Content = new MainPage(mainViewModel, playerViewModel);
+        _window.Content = new MainPage(mainViewModel, _playerViewModel);
         _window.Activate();
 
         Log.Information("Application launched");

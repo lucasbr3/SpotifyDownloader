@@ -75,6 +75,7 @@ public partial class MainViewModel : ObservableObject
     private void DebounceSearch()
     {
         _debounceCts?.Cancel();
+        _debounceCts?.Dispose();
         _debounceCts = new CancellationTokenSource();
         var token = _debounceCts.Token;
 
