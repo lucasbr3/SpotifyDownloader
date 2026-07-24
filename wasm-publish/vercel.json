@@ -1,0 +1,8 @@
+{
+  "buildCommand": "dotnet publish SpotifyDownloader.Wasm.csproj -c Release -o publish",
+  "outputDirectory": "publish/wwwroot",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "framework": null
+}

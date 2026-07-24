@@ -124,3 +124,26 @@ jobs:
           files: |
             ${{ github.workspace }}\Installer\*.exe
           generate_release_notes: true
+
+  deploy-vercel:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: SpotifyDownloader-WASM
+          path: wasm-output
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+
+      - name: Deploy to Vercel
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          npx vercel deploy --token=${{ secrets.VERCEL_TOKEN }} \
+            --cwd wasm-output \
+            --prod \
+            --yes

@@ -14,6 +14,9 @@ builder.Services.AddSingleton<IUpdateService, UpdateService>();
 var app = builder.Build();
 
 app.UseCors();
+app.UseDefaultFiles();
+app.UseStaticFiles();
 app.MapControllers();
+app.MapFallbackToFile("index.html");
 
 app.Run();
