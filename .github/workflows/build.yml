@@ -54,8 +54,11 @@ jobs:
             Write-Warning "Continuing without MSIX signing..."
           }
 
-      - name: Restore NuGet packages
+      - name: Restore NuGet packages (WinUI)
         run: dotnet restore SpotifyDownloader.sln -p:Platform=${{ env.PLATFORM }}
+
+      - name: Restore NuGet packages (Web)
+        run: dotnet restore SpotifyDownloader.Web.sln
 
       - name: Build Core (class library)
         run: dotnet build src/SpotifyDownloader.Core/SpotifyDownloader.Core.csproj -c ${{ env.CONFIGURATION }} -p:Platform=${{ env.PLATFORM }} --no-restore
@@ -63,22 +66,13 @@ jobs:
       - name: Build App (WinUI 3)
         run: dotnet build src/SpotifyDownloader.App/SpotifyDownloader.App.csproj -c ${{ env.CONFIGURATION }} -p:Platform=${{ env.PLATFORM }} --no-restore
 
+      - name: Build Web API
+        run: dotnet build src/SpotifyDownloader.Api/SpotifyDownloader.Api.csproj -c ${{ env.CONFIGURATION }}
+
+      - name: Build Web WASM
+        run: dotnet build src/SpotifyDownloader.Wasm/SpotifyDownloader.Wasm.csproj -c ${{ env.CONFIGURATION }}
+
       - name: Prepare Release folder
-        shell: pwsh
-        run: |
-          $src = "${{ github.workspace }}\src\SpotifyDownloader.App\bin\${{ env.PLATFORM }}\${{ env.CONFIGURATION }}\net8.0-windows10.0.19041.0"
-          $release = "${{ github.workspace }}\Release"
-          New-Item -ItemType Directory -Path $release -Force | Out-Null
-          if (Test-Path $src) {
-            Copy-Item "$src\*" $release -Recurse -Force -ErrorAction SilentlyContinue
-            Remove-Item "$release\*.pdb" -Force -ErrorAction SilentlyContinue
-            Remove-Item "$release\*.xml" -Force -ErrorAction SilentlyContinue
-            Remove-Item "$release\*.config" -Force -ErrorAction SilentlyContinue
-          } else {
-            Write-Warning "Build output not found at: $src"
-          }
-          Write-Host "Release folder contents:"
-          Get-ChildItem -Path $release -Recurse | Select-Object Name, Length | Format-Table -AutoSize
 
       - name: Compile Inno Setup installer
         shell: pwsh
@@ -106,6 +100,13 @@ jobs:
           path: |
             ${{ github.workspace }}\Release\**\*
             ${{ github.workspace }}\Installer\*.exe
+          compression-level: 9
+
+      - name: Upload Web WASM (for Vercel)
+        uses: actions/upload-artifact@v4
+        with:
+          name: SpotifyDownloader-WASM
+          path: ${{ github.workspace }}\src\SpotifyDownloader.Wasm\bin\Release\net8.0\wwwroot\**\*
           compression-level: 9
 
       - name: Upload Inno Setup installer
