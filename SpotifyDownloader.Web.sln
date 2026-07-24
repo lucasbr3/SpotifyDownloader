@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C251B731-0005-4343-AEDB-873DCF4AF07F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpotifyDownloader.Shared", "src\SpotifyDownloader.Shared\SpotifyDownloader.Shared.csproj", "{11284664-FB3D-49A6-86A5-497E20BC9F43}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpotifyDownloader.Api", "src\SpotifyDownloader.Api\SpotifyDownloader.Api.csproj", "{424D5E6F-4CBC-41E7-AE81-96D90C20A97C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpotifyDownloader.Wasm", "src\SpotifyDownloader.Wasm\SpotifyDownloader.Wasm.csproj", "{D22923DC-0B77-42B6-B8DE-B3C0AAAF5737}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{11284664-FB3D-49A6-86A5-497E20BC9F43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11284664-FB3D-49A6-86A5-497E20BC9F43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11284664-FB3D-49A6-86A5-497E20BC9F43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11284664-FB3D-49A6-86A5-497E20BC9F43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{424D5E6F-4CBC-41E7-AE81-96D90C20A97C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{424D5E6F-4CBC-41E7-AE81-96D90C20A97C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{424D5E6F-4CBC-41E7-AE81-96D90C20A97C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{424D5E6F-4CBC-41E7-AE81-96D90C20A97C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D22923DC-0B77-42B6-B8DE-B3C0AAAF5737}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D22923DC-0B77-42B6-B8DE-B3C0AAAF5737}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D22923DC-0B77-42B6-B8DE-B3C0AAAF5737}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D22923DC-0B77-42B6-B8DE-B3C0AAAF5737}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{11284664-FB3D-49A6-86A5-497E20BC9F43} = {C251B731-0005-4343-AEDB-873DCF4AF07F}
+		{424D5E6F-4CBC-41E7-AE81-96D90C20A97C} = {C251B731-0005-4343-AEDB-873DCF4AF07F}
+		{D22923DC-0B77-42B6-B8DE-B3C0AAAF5737} = {C251B731-0005-4343-AEDB-873DCF4AF07F}
+	EndGlobalSection
+EndGlobal

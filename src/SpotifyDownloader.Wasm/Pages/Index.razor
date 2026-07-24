@@ -1,0 +1,112 @@
+@page "/"
+@using System.Net.Http.Json
+@using SpotifyDownloader.Shared
+@inject HttpClient Http
+
+<div class="search-page">
+    <div class="search-header">
+        <h1>Spotify Downloader</h1>
+        <p class="subtitle">Pesquise músicas, artistas ou cole um link do Spotify</p>
+        <div class="search-box">
+            <input type="text" class="search-input" placeholder="O que você quer ouvir?" @bind="Query" @bind:event="oninput"
+                   @onkeydown="OnKeyDown" />
+            <button class="search-btn" @onclick="SearchAsync">Pesquisar</button>
+        </div>
+    </div>
+
+    @if (IsLoading)
+    {
+        <div class="loading">Carregando...</div>
+    }
+
+    @if (Results != null && Results.Tracks.Count > 0)
+    {
+        <div class="results-count">@Results.Tracks.Count resultados encontrados</div>
+        <div class="track-grid">
+            @foreach (var track in Results.Tracks)
+            {
+                <div class="track-card">
+                    <div class="card-cover">
+                        <img src="@track.BestCoverUrl" alt="@track.Album" />
+                        <div class="card-overlay">
+                            <button class="play-overlay-btn" @onclick="() => PlayTrack(track)">&#x25B6;</button>
+                            <button class="download-overlay-btn" @onclick="() => DownloadTrack(track)">&#x2B07;</button>
+                        </div>
+                    </div>
+                    <div class="card-info">
+                        <span class="card-title" title="@track.Title">@track.Title</span>
+                        <span class="card-artist" title="@track.Artist">@track.Artist</span>
+                        <span class="card-album" title="@track.Album">@track.Album</span>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    @if (Results != null && !Results.HasResults && !IsLoading)
+    {
+        <div class="no-results">Nenhum resultado encontrado</div>
+    }
+</div>
+
+@code {
+    private string Query = string.Empty;
+    private SearchResults? Results;
+    private bool IsLoading;
+
+    private async Task SearchAsync()
+    {
+        if (string.IsNullOrWhiteSpace(Query)) return;
+        IsLoading = true;
+        try
+        {
+            Results = await Http.GetFromJsonAsync<SearchResults>($"api/spotify/search?q={Uri.EscapeDataString(Query)}&limit=20");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Search failed: {ex.Message}");
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    private void OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") _ = SearchAsync();
+    }
+
+    private void PlayTrack(SpotifyTrack track)
+    {
+        // TODO: Connect to PlayerBar
+    }
+
+    private async Task DownloadTrack(SpotifyTrack track)
+    {
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/spotify/download", new
+            {
+                trackId = track.Id,
+                title = track.Title,
+                artist = track.Artist,
+                album = track.Album,
+                coverUrl = track.BestCoverUrl,
+                durationMs = track.DurationMs
+            });
+            if (response.IsSuccessStatusCode)
+            {
+                var bytes = await response.Content.ReadAsByteArrayAsync();
+                var fileName = $"{track.Title} - {track.Artist}.mp3";
+                using var stream = new MemoryStream(bytes);
+                using var fileStream = new FileStream(fileName, FileMode.Create, FileAccess.Write);
+                await stream.CopyToAsync(fileStream);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Download failed: {ex.Message}");
+        }
+    }
+}

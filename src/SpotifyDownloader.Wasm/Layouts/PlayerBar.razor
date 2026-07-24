@@ -1,0 +1,53 @@
+<div class="player-bar @(CurrentTrack != null ? "visible" : "")">
+    <div class="player-info">
+        @if (CurrentTrack != null)
+        {
+            <img src="@CurrentTrack.BestCoverUrl" alt="" class="player-cover" />
+            <div class="player-text">
+                <span class="player-title">@CurrentTrack.Title</span>
+                <span class="player-artist">@CurrentTrack.Artist</span>
+            </div>
+        }
+    </div>
+    <div class="player-controls">
+        <div class="controls-center">
+            <button class="ctrl-btn" @onclick="Previous">&#x23EE;</button>
+            <button class="ctrl-btn play-btn" @onclick="TogglePlay">@(IsPlaying ? "&#x23F8;" : "&#x25B6;")</button>
+            <button class="ctrl-btn" @onclick="Next">&#x23ED;</button>
+        </div>
+        <div class="progress-row">
+            <span class="time">@PositionFormatted</span>
+            <input type="range" class="progress-slider" min="0" max="@DurationSeconds" value="@PositionSeconds"
+                   @oninput="OnSeek" />
+            <span class="time">@DurationFormatted</span>
+        </div>
+    </div>
+    <div class="player-volume">
+        <span class="vol-icon">&#x1F50A;</span>
+        <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="@Volume" @oninput="OnVolumeChange" />
+    </div>
+</div>
+
+@code {
+    private SpotifyDownloader.Shared.SpotifyTrack? CurrentTrack;
+    private bool IsPlaying;
+    private double PositionSeconds;
+    private double DurationSeconds;
+    private double Volume = 0.8;
+    private string PositionFormatted => TimeSpan.FromSeconds(PositionSeconds).ToString(@"m\:ss");
+    private string DurationFormatted => TimeSpan.FromSeconds(DurationSeconds).ToString(@"m\:ss");
+
+    private void TogglePlay() { IsPlaying = !IsPlaying; }
+    private void Previous() { }
+    private void Next() { }
+    private void OnSeek(ChangeEventArgs e) { PositionSeconds = double.Parse(e.Value?.ToString() ?? "0"); }
+    private void OnVolumeChange(ChangeEventArgs e) { Volume = double.Parse(e.Value?.ToString() ?? "0.8"); }
+
+    public void Play(SpotifyDownloader.Shared.SpotifyTrack track)
+    {
+        CurrentTrack = track;
+        DurationSeconds = track.DurationMs / 1000.0;
+        PositionSeconds = 0;
+        IsPlaying = true;
+    }
+}

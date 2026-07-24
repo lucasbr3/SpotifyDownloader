@@ -34,15 +34,15 @@ public class MetadataService : IMetadataService
             var url = $"https://www.youtube.com/results?search_query={encoded}";
             var html = await _httpClient.GetStringAsync(url);
 
-            var videoIds = ExtractVideoIds(html, limit);
+            var entries = ExtractYouTubeEntries(html, limit);
             var tracks = new List<SpotifyTrack>();
 
-            foreach (var videoId in videoIds)
+            foreach (var (videoId, title) in entries)
             {
                 var track = new SpotifyTrack
                 {
                     Id = videoId,
-                    Title = ExtractTitleFromVideoId(videoId) ?? $"Video {videoId}",
+                    Title = title ?? $"Video {videoId}",
                     Artist = "YouTube",
                     Album = "YouTube Audio",
                     AlbumCoverUrl = $"https://img.youtube.com/vi/{videoId}/mqdefault.jpg",
@@ -62,6 +62,33 @@ public class MetadataService : IMetadataService
         }
 
         return results;
+    }
+
+    private static List<(string Id, string? Title)> ExtractYouTubeEntries(string html, int maxResults)
+    {
+        var entries = new List<(string Id, string? Title)>();
+        var regex = new Regex("/watch\\?v=([a-zA-Z0-9_-]{11})");
+        var titleRegex = new Regex("title=\"([^\"]+)\"");
+        var seen = new HashSet<string>();
+
+        foreach (Match match in regex.Matches(html))
+        {
+            var id = match.Groups[1].Value;
+            if (!seen.Add(id)) continue;
+
+            string? title = null;
+            var start = Math.Max(0, match.Index - 300);
+            var len = Math.Min(400, html.Length - start);
+            var snippet = html.Substring(start, len);
+            var t = titleRegex.Match(snippet);
+            if (t.Success)
+                title = System.Net.WebUtility.HtmlDecode(t.Groups[1].Value);
+
+            entries.Add((id, title));
+            if (entries.Count >= maxResults) break;
+        }
+
+        return entries;
     }
 
     public async Task<SpotifyTrack?> GetTrackAsync(string queryOrUrl)
@@ -224,31 +251,10 @@ public class MetadataService : IMetadataService
         }
     }
 
-    private static List<string> ExtractVideoIds(string html, int maxResults)
-    {
-        var ids = new List<string>();
-        var matches = Regex.Matches(html, "/watch\\?v=([a-zA-Z0-9_-]{11})");
-        foreach (Match match in matches)
-        {
-            var id = match.Groups[1].Value;
-            if (!ids.Contains(id))
-            {
-                ids.Add(id);
-                if (ids.Count >= maxResults) break;
-            }
-        }
-        return ids;
-    }
-
     private static string? ExtractVideoIdFromUrl(string url)
     {
         var match = Regex.Match(url, "(?:youtube\\.com/watch\\?v=|youtu\\.be/)([a-zA-Z0-9_-]{11})");
         return match.Success ? match.Groups[1].Value : null;
-    }
-
-    private static string? ExtractTitleFromVideoId(string videoId)
-    {
-        return null;
     }
 
     private static string? ExtractMetaProperty(string html, string property)
