@@ -4,13 +4,11 @@ COPY . .
 
 RUN apt-get update -qq && apt-get install -y -qq python3 && ln -s /usr/bin/python3 /usr/bin/python
 
-RUN dotnet workload install wasm-tools 2>/dev/null || echo "wasm-tools optional"
-
 RUN dotnet publish src/SpotifyDownloader.Shared/SpotifyDownloader.Shared.csproj -c Release -o /app/shared
 RUN dotnet publish src/SpotifyDownloader.Wasm/SpotifyDownloader.Wasm.csproj -c Release -o /app/wasm
 RUN dotnet publish src/SpotifyDownloader.Api/SpotifyDownloader.Api.csproj -c Release -o /app/api
 
-RUN mkdir -p /app/api/wwwroot && cp -r /app/wasm/wwwroot/* /app/api/wwwroot/
+RUN cp -r /app/wasm/wwwroot/* /app/api/wwwroot/
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
