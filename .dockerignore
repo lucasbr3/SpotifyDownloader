@@ -1,0 +1,16 @@
+build/
+api-linux/
+wasm-publish/
+bin/
+obj/
+.vs/
+*.zip
+.git/
+.github/
+updates/
+logs/
+Release/
+Installer/
+AppPackages/
+*.msix
+**/.gitignore
