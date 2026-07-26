@@ -3,10 +3,10 @@ WORKDIR /app
 COPY . .
 
 RUN dotnet publish src/SpotifyDownloader.Shared/SpotifyDownloader.Shared.csproj -c Release -o /app/shared
-RUN dotnet publish src/SpotifyDownloader.Wasm/SpotifyDownloader.Wasm.csproj -c Release -o /app/wasm
+RUN dotnet publish src/SpotifyDownloader.Wasm/SpotifyDownloader.Wasm.csproj -c Release -o /app/wasm-output
 RUN dotnet publish src/SpotifyDownloader.Api/SpotifyDownloader.Api.csproj -c Release -o /app/api
 
-RUN cp -r /app/wasm/wwwroot/. /app/api/wwwroot/
+RUN mkdir -p /app/api/wwwroot && cp -r /app/wasm-output/wwwroot/. /app/api/wwwroot/
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
