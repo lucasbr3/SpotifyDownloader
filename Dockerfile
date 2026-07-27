@@ -21,9 +21,7 @@ RUN mkdir -p /app/api/wwwroot && \
         echo "ERROR: WASM wwwroot not found"; exit 1; \
     fi
 
-RUN find /app -name "icudt_*.dat" -exec cp -v {} /app/api/wwwroot/_framework/ \;
-
-RUN python3 -c "import json,os; fw='/app/api/wwwroot/_framework'; b=json.load(open(fw+'/blazor.boot.json')); h=any(f.startswith('icudt_') and f.endswith('.dat') for f in os.listdir(fw)); h or b.get('resources',{}).pop('icu',None); json.dump(b,open(fw+'/blazor.boot.json','w'),indent=2); print('OK' if h else 'ICU removed')"
+RUN python3 -c "b=json.load(open('/app/api/wwwroot/_framework/blazor.boot.json')); b.get('resources',{}).pop('icu',None); b['globalizationMode']='invariant'; json.dump(b,open('/app/api/wwwroot/_framework/blazor.boot.json','w'),indent=2); print('OK')"
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
