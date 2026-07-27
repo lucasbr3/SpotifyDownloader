@@ -19,18 +19,15 @@ RUN mkdir -p /app/api/wwwroot && \
     fi
 
 # Remove ICU entries from boot.json (files not available without wasm-tools)
-RUN if [ -f /app/api/wwwroot/_framework/blazor.boot.json ]; then \
-        python3 -c "
-import json
-with open('/app/api/wwwroot/_framework/blazor.boot.json') as f:
+RUN echo 'import json
+with open("/app/api/wwwroot/_framework/blazor.boot.json") as f:
     boot = json.load(f)
-if 'icu' in boot.get('resources', {}):
-    del boot['resources']['icu']
-with open('/app/api/wwwroot/_framework/blazor.boot.json', 'w') as f:
+if "icu" in boot.get("resources", {}):
+    del boot["resources"]["icu"]
+with open("/app/api/wwwroot/_framework/blazor.boot.json", "w") as f:
     json.dump(boot, f, indent=2)
-print('ICU removed from boot.json')
-"; \
-    else echo "No boot.json found"; fi
+print("ICU removed from boot.json")
+' > /tmp/fix_boot.py && python3 /tmp/fix_boot.py
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
