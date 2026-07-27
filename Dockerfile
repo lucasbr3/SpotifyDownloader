@@ -23,19 +23,7 @@ RUN mkdir -p /app/api/wwwroot && \
 
 RUN find /app -name "icudt_*.dat" -exec cp -v {} /app/api/wwwroot/_framework/ \;
 
-RUN python3 -c "
-import json, os
-fw = '/app/api/wwwroot/_framework'
-boot = json.load(open(fw + '/blazor.boot.json'))
-has_icu = any(f.startswith('icudt_') and f.endswith('.dat') for f in os.listdir(fw))
-if not has_icu:
-    print('ICU files missing - removing from boot.json and disabling ICU in runtime')
-    if 'icu' in boot.get('resources', {}):
-        del boot['resources']['icu']
-else:
-    print('ICU files found')
-json.dump(boot, open(fw + '/blazor.boot.json', 'w'), indent=2)
-"
+RUN python3 -c "import json,os; fw='/app/api/wwwroot/_framework'; b=json.load(open(fw+'/blazor.boot.json')); h=any(f.startswith('icudt_') and f.endswith('.dat') for f in os.listdir(fw)); h or b.get('resources',{}).pop('icu',None); json.dump(b,open(fw+'/blazor.boot.json','w'),indent=2); print('OK' if h else 'ICU removed')"
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
