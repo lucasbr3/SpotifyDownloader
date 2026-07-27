@@ -2,6 +2,8 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 COPY . .
 
+RUN apt-get update -qq && apt-get install -y -qq python3 && ln -sf /usr/bin/python3 /usr/bin/python
+
 RUN dotnet workload install wasm-tools
 
 RUN dotnet publish src/SpotifyDownloader.Shared/SpotifyDownloader.Shared.csproj -c Release -o /app/shared
