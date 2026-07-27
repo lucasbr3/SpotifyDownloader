@@ -21,7 +21,7 @@ RUN mkdir -p /app/api/wwwroot && \
         echo "ERROR: WASM wwwroot not found"; exit 1; \
     fi
 
-RUN python3 -c "b=json.load(open('/app/api/wwwroot/_framework/blazor.boot.json')); b.get('resources',{}).pop('icu',None); b['globalizationMode']='invariant'; json.dump(b,open('/app/api/wwwroot/_framework/blazor.boot.json','w'),indent=2); print('OK')"
+RUN python3 -c "import json; b=json.load(open('/app/api/wwwroot/_framework/blazor.boot.json')); b.get('resources',{}).pop('icu',None); b['globalizationMode']='invariant'; json.dump(b,open('/app/api/wwwroot/_framework/blazor.boot.json','w'),indent=2); print('OK')"
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
