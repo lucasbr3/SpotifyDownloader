@@ -339,10 +339,20 @@ public class DownloadService : IDownloadService
             };
 
             process.Start();
+            var stderr = await process.StandardError.ReadToEndAsync();
             await process.WaitForExitAsync(ct);
 
-            if (process.ExitCode != 0) return false;
-            if (!File.Exists(finalPath)) return false;
+            if (process.ExitCode != 0)
+            {
+                Log.Error("yt-dlp failed: {Error}", stderr);
+                item.ErrorMessage = stderr.Length > 200 ? stderr[..200] : stderr;
+                return false;
+            }
+            if (!File.Exists(finalPath))
+            {
+                item.ErrorMessage = "Output file not found";
+                return false;
+            }
 
             return true;
         }

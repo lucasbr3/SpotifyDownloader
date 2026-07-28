@@ -10,7 +10,7 @@ RUN mkdir -p /app/api/wwwroot && cp -r /app/wasm/wwwroot/. /app/api/wwwroot/
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 RUN apt-get update -qq && apt-get install -y -qq ffmpeg python3 python3-pip && rm -rf /var/lib/apt/lists/*
-RUN pip3 install yt-dlp -q
+RUN pip3 install yt-dlp -q && which yt-dlp
 WORKDIR /app
 COPY --from=build /app/api .
 RUN rm -f ffmpeg.exe
