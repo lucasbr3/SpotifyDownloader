@@ -9,8 +9,10 @@ RUN dotnet publish src/SpotifyDownloader.Shared/SpotifyDownloader.Shared.csproj 
 RUN mkdir -p /app/api/wwwroot && cp -r /app/wasm/wwwroot/. /app/api/wwwroot/
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+RUN apt-get update -qq && apt-get install -y -qq ffmpeg && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=build /app/api .
+RUN rm -f ffmpeg.exe
 ENV PORT=8080
 ENV ASPNETCORE_URLS=http://0.0.0.0:${PORT}
 ENV ASPNETCORE_ENVIRONMENT=Production
