@@ -307,31 +307,29 @@ public class DownloadService : IDownloadService
     {
         try
         {
-            var ffmpeg = await GetFfmpegPathAsync();
-            var bitrate = (int)quality;
             var extension = GetExtension(format);
             var finalPath = Path.ChangeExtension(outputPath, extension);
+            item.OutputPath = finalPath;
 
-            var codec = format switch
+            var audioFormat = format switch
             {
-                AudioFormat.Mp3 => "libmp3lame",
+                AudioFormat.Mp3 => "mp3",
                 AudioFormat.Flac => "flac",
-                AudioFormat.Wav => "pcm_s16le",
-                AudioFormat.M4a => "aac",
-                AudioFormat.Ogg => "libvorbis",
-                _ => "libmp3lame"
+                AudioFormat.Wav => "wav",
+                AudioFormat.M4a => "m4a",
+                AudioFormat.Ogg => "ogg",
+                _ => "mp3"
             };
 
-            var args = $"-i \"{audioUrl}\" -codec:a {codec} -b:a {bitrate}k " +
-                       $"-map 0:a -id3v2_version 3 -write_id3v1 1 -y \"{finalPath}\"";
-
-            item.OutputPath = finalPath;
+            var args = $"-x --audio-format {audioFormat} --audio-quality 0 " +
+                       $"-o \"{Path.ChangeExtension(outputPath, \"%(ext)s\")}\" " +
+                       $"\"{audioUrl}\"";
 
             using var process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = ffmpeg,
+                    FileName = "yt-dlp",
                     Arguments = args,
                     UseShellExecute = false,
                     CreateNoWindow = true,
